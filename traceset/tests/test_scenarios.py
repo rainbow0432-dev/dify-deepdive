@@ -44,3 +44,8 @@ def test_s01_chat_basic():
 def test_s02_chat_rag():
     from traceset.scenarios import s02_chat_rag
     _check_scenario(s02_chat_rag)
+
+
+def test_s03_completion_basic():
+    from traceset.scenarios import s03_completion_basic
+    _check_scenario(s03_completion_basic)
