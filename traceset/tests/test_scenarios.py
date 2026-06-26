@@ -59,3 +59,13 @@ def test_s04_agent_single_tool():
 def test_s05_agent_multi_tool():
     from traceset.scenarios import s05_agent_multi_tool
     _check_scenario(s05_agent_multi_tool)
+
+
+def test_s06_workflow_5node():
+    from traceset.scenarios import s06_workflow_5node
+    _check_scenario(s06_workflow_5node)
+
+
+def test_s07_workflow_15node():
+    from traceset.scenarios import s07_workflow_15node
+    _check_scenario(s07_workflow_15node)
