@@ -69,3 +69,8 @@ def test_s06_workflow_5node():
 def test_s07_workflow_15node():
     from traceset.scenarios import s07_workflow_15node
     _check_scenario(s07_workflow_15node)
+
+
+def test_s08_chatflow_basic():
+    from traceset.scenarios import s08_chatflow_basic
+    _check_scenario(s08_chatflow_basic)
