@@ -94,3 +94,13 @@ def test_s11_rag_empty_results():
 def test_s12_tool_failure():
     from traceset.scenarios import s12_tool_failure
     _check_scenario(s12_tool_failure)
+
+
+def test_s13_suggested_questions_error():
+    from traceset.scenarios import s13_suggested_questions_error
+    _check_scenario(s13_suggested_questions_error)
+
+
+def test_s14_message_streaming():
+    from traceset.scenarios import s14_message_streaming
+    _check_scenario(s14_message_streaming)
