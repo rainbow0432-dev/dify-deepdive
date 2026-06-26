@@ -84,3 +84,13 @@ def test_s09_moderation_blocked():
 def test_s10_moderation_pass_through():
     from traceset.scenarios import s10_moderation_pass_through
     _check_scenario(s10_moderation_pass_through)
+
+
+def test_s11_rag_empty_results():
+    from traceset.scenarios import s11_rag_empty_results
+    _check_scenario(s11_rag_empty_results)
+
+
+def test_s12_tool_failure():
+    from traceset.scenarios import s12_tool_failure
+    _check_scenario(s12_tool_failure)
