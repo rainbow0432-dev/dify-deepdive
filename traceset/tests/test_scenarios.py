@@ -74,3 +74,13 @@ def test_s07_workflow_15node():
 def test_s08_chatflow_basic():
     from traceset.scenarios import s08_chatflow_basic
     _check_scenario(s08_chatflow_basic)
+
+
+def test_s09_moderation_blocked():
+    from traceset.scenarios import s09_moderation_blocked
+    _check_scenario(s09_moderation_blocked)
+
+
+def test_s10_moderation_pass_through():
+    from traceset.scenarios import s10_moderation_pass_through
+    _check_scenario(s10_moderation_pass_through)
