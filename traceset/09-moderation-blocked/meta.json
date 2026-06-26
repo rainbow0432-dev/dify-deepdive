@@ -1,0 +1,35 @@
+{
+  "scenario_id": "09-moderation-blocked",
+  "scenario_description": "Chatbot with moderation that blocks the input, preset response returned",
+  "app_type": "chatbot",
+  "dify_app_mode": "chat",
+  "edge_case": "moderation-blocked",
+  "trace_types_emitted": [
+    "ModerationTraceInfo",
+    "MessageTraceInfo"
+  ],
+  "expected_event_count": 3,
+  "events_in_order": [
+    {
+      "index": 1,
+      "type": "span-create",
+      "source_trace_type": "ModerationTraceInfo",
+      "dify_handler": "LangFuseDataTrace.moderation_trace"
+    },
+    {
+      "index": 2,
+      "type": "trace-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 3,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    }
+  ],
+  "dify_commit": "b33e8f0ddb1189427548b0e1206cedcdc17d9bb6",
+  "langfuse_sdk_version": ">=4.2.0,<5.0.0",
+  "notes": "Edge: moderation-blocked. Preset response without real LLM call. VERIFY: does generation-create fire?"
+}
