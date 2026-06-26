@@ -39,3 +39,8 @@ def _check_scenario(module):
 def test_s01_chat_basic():
     from traceset.scenarios import s01_chat_basic
     _check_scenario(s01_chat_basic)
+
+
+def test_s02_chat_rag():
+    from traceset.scenarios import s02_chat_rag
+    _check_scenario(s02_chat_rag)
