@@ -1,0 +1,48 @@
+{
+  "scenario_id": "13-suggested-questions-error",
+  "scenario_description": "Chatbot where suggested questions generation fails with an error",
+  "app_type": "chatbot",
+  "dify_app_mode": "chat",
+  "edge_case": "suggested-questions-error",
+  "trace_types_emitted": [
+    "MessageTraceInfo",
+    "GenerateNameTraceInfo",
+    "SuggestedQuestionTraceInfo"
+  ],
+  "expected_event_count": 5,
+  "events_in_order": [
+    {
+      "index": 1,
+      "type": "trace-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 2,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 3,
+      "type": "trace-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    },
+    {
+      "index": 4,
+      "type": "span-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    },
+    {
+      "index": 5,
+      "type": "generation-create",
+      "source_trace_type": "SuggestedQuestionTraceInfo",
+      "dify_handler": "LangFuseDataTrace.suggested_question_trace"
+    }
+  ],
+  "dify_commit": "b33e8f0ddb1189427548b0e1206cedcdc17d9bb6",
+  "langfuse_sdk_version": ">=4.2.0,<5.0.0",
+  "notes": "Edge: suggested-questions-error. SuggestedQuestion generation-create has level=ERROR and statusMessage with rate limit error. The LLM call consumed input tokens before failing (output=0)."
+}

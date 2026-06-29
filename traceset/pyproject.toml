@@ -1,0 +1,16 @@
+[project]
+name = "dify-trace-catalog"
+version = "0.1.0"
+description = "Reference catalog of Dify app traces as Langfuse wire events"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "langfuse>=4.2.0,<5.0.0",
+    "pytest>=7.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

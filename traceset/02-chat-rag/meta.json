@@ -1,0 +1,55 @@
+{
+  "scenario_id": "02-chat-rag",
+  "scenario_description": "Chatbot with knowledge base retrieval, suggested questions, auto-name",
+  "app_type": "chatbot",
+  "dify_app_mode": "chat",
+  "edge_case": null,
+  "trace_types_emitted": [
+    "MessageTraceInfo",
+    "DatasetRetrievalTraceInfo",
+    "SuggestedQuestionTraceInfo",
+    "GenerateNameTraceInfo"
+  ],
+  "expected_event_count": 6,
+  "events_in_order": [
+    {
+      "index": 1,
+      "type": "trace-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 2,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 3,
+      "type": "span-create",
+      "source_trace_type": "DatasetRetrievalTraceInfo",
+      "dify_handler": "LangFuseDataTrace.dataset_retrieval_trace"
+    },
+    {
+      "index": 4,
+      "type": "generation-create",
+      "source_trace_type": "SuggestedQuestionTraceInfo",
+      "dify_handler": "LangFuseDataTrace.suggested_question_trace"
+    },
+    {
+      "index": 5,
+      "type": "trace-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    },
+    {
+      "index": 6,
+      "type": "span-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    }
+  ],
+  "dify_commit": "b33e8f0ddb1189427548b0e1206cedcdc17d9bb6",
+  "langfuse_sdk_version": ">=4.2.0,<5.0.0",
+  "notes": "Chat with knowledge base. RAG retrieval + suggested questions + auto-name."
+}
