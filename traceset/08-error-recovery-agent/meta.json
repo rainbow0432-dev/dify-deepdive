@@ -1,0 +1,94 @@
+{
+  "scenario_id": "08-error-recovery-agent",
+  "scenario_description": "5 tool attempts (4 errors + 1 success) + RAG + synthesis + GenerateName",
+  "app_type": "agent-chat",
+  "dify_app_mode": "agent-chat",
+  "edge_case": "error-recovery",
+  "trace_types_emitted": [
+    "MessageTraceInfo",
+    "ToolTraceInfo",
+    "DatasetRetrievalTraceInfo",
+    "SuggestedQuestionTraceInfo",
+    "GenerateNameTraceInfo"
+  ],
+  "expected_event_count": 12,
+  "expected_span_count": 10,
+  "span_pattern": "error-recovery",
+  "events_in_order": [
+    {
+      "index": 1,
+      "type": "trace-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 2,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 3,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 4,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 5,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 6,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 7,
+      "type": "span-create",
+      "source_trace_type": "DatasetRetrievalTraceInfo",
+      "dify_handler": "LangFuseDataTrace.dataset_retrieval_trace"
+    },
+    {
+      "index": 8,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 9,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 10,
+      "type": "generation-create",
+      "source_trace_type": "SuggestedQuestionTraceInfo",
+      "dify_handler": "LangFuseDataTrace.suggested_question_trace"
+    },
+    {
+      "index": 11,
+      "type": "trace-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    },
+    {
+      "index": 12,
+      "type": "span-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    }
+  ],
+  "dify_commit": "b33e8f0ddb1189427548b0e1206cedcdc17d9bb6",
+  "langfuse_sdk_version": ">=4.2.0,<5.0.0",
+  "notes": "VERIFY: 4 consecutive tool errors (TimeoutError, AuthenticationError, ConnectionError, FileNotFoundError) before successful cache_lookup fallback. All error spans have level=ERROR."
+}
