@@ -4,10 +4,10 @@
 For each scenario:
   1. Build events via scenario.build_events()
   2. Validate each event via schema.validate_event()
-  3. Run self-checks (event count, monotonic timestamps, no snake_case)
+  3. Run self-checks (7 checks including span count)
   4. Write events.jsonl and meta.json
 
-Also generates root files: catalog.json, README.md, schema.md (Task 14).
+Also generates root files: catalog.json, README.md, schema.md.
 """
 from __future__ import annotations
 
@@ -22,10 +22,7 @@ _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def generate_scenario(scenario, base_dir: str) -> dict:
-    """Generate events.jsonl and meta.json for one scenario.
-
-    Returns a catalog entry dict.
-    """
+    """Generate events.jsonl and meta.json for one scenario."""
     scenario_id = scenario.SCENARIO_ID
     scenario_dir = os.path.join(base_dir, scenario_id)
     os.makedirs(scenario_dir, exist_ok=True)
@@ -33,57 +30,49 @@ def generate_scenario(scenario, base_dir: str) -> dict:
     events = scenario.build_events()
     meta = scenario.build_meta()
 
-    # ── Validate each event against the wire schema ─────────────────
     for event in events:
         validate_event(event)
 
-    # ── Self-checks ─────────────────────────────────────────────────
     # 1. Event count matches EXPECTED_EVENT_COUNT
     assert len(events) == scenario.EXPECTED_EVENT_COUNT, (
-        f"{scenario_id}: event count {len(events)} != "
-        f"{scenario.EXPECTED_EVENT_COUNT}"
+        f"{scenario_id}: event count {len(events)} != {scenario.EXPECTED_EVENT_COUNT}"
     )
 
     # 2. All event types are valid
     valid_types = {"trace-create", "span-create", "generation-create"}
     for i, e in enumerate(events):
-        assert e["type"] in valid_types, (
-            f"{scenario_id}[{i}]: invalid type {e['type']}"
-        )
+        assert e["type"] in valid_types, f"{scenario_id}[{i}]: invalid type {e['type']}"
 
     # 3. No snake_case body keys
     for i, e in enumerate(events):
         for key in e["body"]:
-            assert "_" not in key, (
-                f"{scenario_id}[{i}]: snake_case body key '{key}'"
-            )
+            assert "_" not in key, f"{scenario_id}[{i}]: snake_case body key '{key}'"
 
     # 4. Timestamps monotonically non-decreasing
     timestamps = [e["timestamp"] for e in events]
-    assert timestamps == sorted(timestamps), (
-        f"{scenario_id}: timestamps not monotonic"
-    )
+    assert timestamps == sorted(timestamps), f"{scenario_id}: timestamps not monotonic"
 
     # 5. meta events_in_order count matches event count
     assert len(meta["events_in_order"]) == len(events), (
-        f"{scenario_id}: meta events_in_order count "
-        f"{len(meta['events_in_order'])} != event count {len(events)}"
+        f"{scenario_id}: meta events_in_order count mismatch"
     )
 
     # 6. meta events_in_order types match actual events
     for i, (e, m) in enumerate(zip(events, meta["events_in_order"]), 1):
         assert m["index"] == i, f"{scenario_id}: meta index mismatch at {i}"
-        assert m["type"] == e["type"], (
-            f"{scenario_id}[{i}]: meta type {m['type']} != event type {e['type']}"
-        )
+        assert m["type"] == e["type"], f"{scenario_id}[{i}]: meta type mismatch"
 
-    # ── Write events.jsonl ──────────────────────────────────────────
+    # 7. Span count matches EXPECTED_SPAN_COUNT
+    span_count = sum(1 for e in events if e["type"] in ("span-create", "generation-create"))
+    assert span_count == scenario.EXPECTED_SPAN_COUNT, (
+        f"{scenario_id}: span count {span_count} != {scenario.EXPECTED_SPAN_COUNT}"
+    )
+
     events_path = os.path.join(scenario_dir, "events.jsonl")
     with open(events_path, "w", encoding="utf-8") as f:
         for event in events:
             f.write(json.dumps(event, ensure_ascii=False) + "\n")
 
-    # ── Write meta.json ─────────────────────────────────────────────
     meta_path = os.path.join(scenario_dir, "meta.json")
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
@@ -95,21 +84,26 @@ def generate_scenario(scenario, base_dir: str) -> dict:
         "dify_app_mode": scenario.DIFY_APP_MODE,
         "edge_case": scenario.EDGE_CASE,
         "event_count": len(events),
+        "span_count": span_count,
+        "span_pattern": scenario.SPAN_PATTERN,
         "trace_types": scenario.TRACE_TYPES_EMITTED,
     }
 
 
 def generate_catalog(scenarios, base_dir: str) -> None:
-    """Generate catalog.json — machine-readable index of all scenarios."""
+    """Generate catalog.json."""
     catalog = []
     for scenario in scenarios:
         events = scenario.build_events()
+        span_count = sum(1 for e in events if e["type"] in ("span-create", "generation-create"))
         catalog.append({
             "scenario_id": scenario.SCENARIO_ID,
             "app_type": scenario.APP_TYPE,
             "dify_app_mode": scenario.DIFY_APP_MODE,
             "edge_case": scenario.EDGE_CASE,
             "event_count": len(events),
+            "span_count": span_count,
+            "span_pattern": scenario.SPAN_PATTERN,
             "trace_types": scenario.TRACE_TYPES_EMITTED,
         })
 
@@ -120,13 +114,14 @@ def generate_catalog(scenarios, base_dir: str) -> None:
 
 
 def generate_readme(scenarios, base_dir: str) -> None:
-    """Generate README.md — catalog overview and how-to-read guide."""
+    """Generate README.md."""
     total_events = sum(len(s.build_events()) for s in scenarios)
+    total_spans = sum(s.EXPECTED_SPAN_COUNT for s in scenarios)
 
     lines = [
         "# Dify App Trace Reference Catalog",
         "",
-        "A collection of 14 reference Dify app traces, captured as Langfuse wire events.",
+        f"A collection of {len(scenarios)} reference Dify app traces, captured as Langfuse wire events.",
         "",
         "## Structure",
         "",
@@ -149,21 +144,20 @@ def generate_readme(scenarios, base_dir: str) -> None:
         "",
         "## Scenarios",
         "",
-        "| # | Directory | App Type | Events | Edge? |",
-        "|---|---|---|---|---|",
+        "| # | Directory | App Type | Events | Spans | Pattern |",
+        "|---|---|---|---|---|---|",
     ]
 
     for s in scenarios:
         events = s.build_events()
-        edge = s.EDGE_CASE or ""
         num = s.SCENARIO_ID.split("-")[0]
         lines.append(
-            f"| {num} | `{s.SCENARIO_ID}` | {s.APP_TYPE} | {len(events)} | {edge} |"
+            f"| {num} | `{s.SCENARIO_ID}` | {s.APP_TYPE} | {len(events)} | {s.EXPECTED_SPAN_COUNT} | {s.SPAN_PATTERN} |"
         )
 
     lines.extend([
         "",
-        f"**Total**: {total_events} events across {len(scenarios)} scenarios.",
+        f"**Total**: {total_events} events, {total_spans} spans across {len(scenarios)} scenarios.",
         "",
         "## Provenance",
         "",
@@ -180,25 +174,16 @@ def generate_schema_doc(base_dir: str) -> None:
     """Generate schema.md — wire event field reference."""
     content = """# Langfuse Wire Event Schema
 
-This document describes the wire event format used in the Dify trace catalog.
-
 ## Event Envelope
-
-Every event in `events.jsonl` has this structure:
 
 ```json
 {
-  "id": "<uuid v4>",
-  "timestamp": "<ISO 8601 UTC, e.g. 2025-01-15T10:30:00.123456+00:00>",
+  "id": "<uuid v5>",
+  "timestamp": "<ISO 8601 UTC>",
   "type": "trace-create" | "span-create" | "generation-create",
-  "body": { ... type-specific ... }
+  "body": { ... }
 }
 ```
-
-- `id`: event ID (UUID, generated by Dify's `_make_event_id()`)
-- `timestamp`: event creation time (ISO 8601 UTC, from Dify's `_now_iso()`)
-- `type`: one of `trace-create`, `span-create`, `generation-create`
-- `body`: type-specific payload (see below)
 
 ## trace-create body
 
@@ -210,15 +195,9 @@ Every event in `events.jsonl` has this structure:
   "input": "<any>",
   "output": "<any>",
   "sessionId": "<string>",
-  "version": "<string>",
-  "release": "<string>",
-  "metadata": "<any>",
-  "tags": ["<string>"],
-  "public": "<bool>"
+  "metadata": "<any>"
 }
 ```
-
-All fields optional; only populated fields appear on the wire.
 
 ## span-create body
 
@@ -229,14 +208,12 @@ All fields optional; only populated fields appear on the wire.
   "name": "<string>",
   "startTime": "<ISO 8601>",
   "endTime": "<ISO 8601>",
-  "metadata": "<any>",
   "input": "<any>",
   "output": "<any>",
+  "metadata": "<any>",
   "level": "DEBUG" | "DEFAULT" | "WARNING" | "ERROR",
   "statusMessage": "<string>",
-  "parentObservationId": "<string>",
-  "version": "<string>",
-  "environment": "<string>"
+  "parentObservationId": "<string>"
 }
 ```
 
@@ -253,14 +230,11 @@ Extends span-create with:
     "input": "<int>",
     "output": "<int>",
     "total": "<int>",
-    "unit": "CHARACTERS" | "TOKENS",
+    "unit": "TOKENS",
     "inputCost": "<float>",
     "outputCost": "<float>",
     "totalCost": "<float>"
-  },
-  "costDetails": { "<key>": "<float>" },
-  "promptName": "<string>",
-  "promptVersion": "<int>"
+  }
 }
 ```
 
@@ -268,7 +242,6 @@ Extends span-create with:
 
 - **camelCase**: all body field names are camelCase on the wire.
 - **exclude_unset + exclude_none**: only fields with non-None values appear.
-- **1 event per POST**: Dify sends one event per HTTP POST to `/api/public/ingestion`.
 
 ## Dify trace type to wire event mapping
 
@@ -295,9 +268,8 @@ def main():
     for scenario in SCENARIOS:
         entry = generate_scenario(scenario, base_dir)
         catalog_entries.append(entry)
-        print(f"  {entry['scenario_id']}: {entry['event_count']} events")
+        print(f"  {entry['scenario_id']}: {entry['event_count']} events, {entry['span_count']} spans")
 
-    # Generate root files
     generate_catalog(SCENARIOS, base_dir)
     print("  catalog.json")
     generate_readme(SCENARIOS, base_dir)
@@ -306,7 +278,8 @@ def main():
     print("  schema.md")
 
     total_events = sum(e["event_count"] for e in catalog_entries)
-    print(f"\nTotal: {total_events} events across {len(SCENARIOS)} scenarios")
+    total_spans = sum(e["span_count"] for e in catalog_entries)
+    print(f"\nTotal: {total_events} events, {total_spans} spans across {len(SCENARIOS)} scenarios")
 
     # Verify all 7 trace types are represented
     all_types = set()
@@ -317,16 +290,12 @@ def main():
         "DatasetRetrievalTraceInfo", "ToolTraceInfo", "GenerateNameTraceInfo",
         "SuggestedQuestionTraceInfo",
     }
-    assert all_types == expected_types, (
-        f"Missing trace types: {expected_types - all_types}"
-    )
+    assert all_types == expected_types, f"Missing trace types: {expected_types - all_types}"
 
     # Verify all 5 Dify app modes are represented
     all_modes = {s.DIFY_APP_MODE for s in SCENARIOS}
     expected_modes = {"chat", "completion", "agent-chat", "workflow", "advanced-chat"}
-    assert all_modes == expected_modes, (
-        f"Missing app modes: {expected_modes - all_modes}"
-    )
+    assert all_modes == expected_modes, f"Missing app modes: {expected_modes - all_modes}"
 
     print("All self-checks passed.")
 
