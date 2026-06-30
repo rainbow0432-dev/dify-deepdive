@@ -143,12 +143,15 @@ def validate_scenario(
 
     assertions = []
 
-    expected_trace_body = trace_events[0]["body"]
-    assertions.append(_assert_eq("trace.id", trace.get("id"), expected_trace_body["id"]))
-    assertions.append(_assert_eq("trace.name", trace.get("name"), expected_trace_body["name"]))
-    assertions.append(_assert_eq("trace.userId", trace.get("userId"), expected_trace_body.get("userId")))
-    assertions.append(_assert_eq("trace.input", trace.get("input"), expected_trace_body.get("input")))
-    assertions.append(_assert_eq("trace.metadata", trace.get("metadata"), expected_trace_body.get("metadata")))
+    # Use the LAST trace-create event's body for name (upsert semantics — last write wins).
+    # Use the FIRST trace-create event's body for userId/input/metadata (set on initial create).
+    expected_trace_body_first = trace_events[0]["body"]
+    expected_trace_body_last = trace_events[-1]["body"]
+    assertions.append(_assert_eq("trace.id", trace.get("id"), expected_trace_body_first["id"]))
+    assertions.append(_assert_eq("trace.name", trace.get("name"), expected_trace_body_last["name"]))
+    assertions.append(_assert_eq("trace.userId", trace.get("userId"), expected_trace_body_first.get("userId")))
+    assertions.append(_assert_eq("trace.input", trace.get("input"), expected_trace_body_first.get("input")))
+    assertions.append(_assert_eq("trace.metadata", trace.get("metadata"), expected_trace_body_first.get("metadata")))
 
     obs_by_id = {o["id"]: o for o in observations}
 
@@ -183,10 +186,30 @@ def validate_scenario(
                 obs.get("model") if obs else None,
                 body.get("model"),
             ))
+            # Langfuse API returns `usage` field (not `usageDetails`).
+            # The `usage` field has {input, output, total, unit} — no cost fields.
+            # Cost fields are computed by Langfuse separately and won't match
+            # our synthetic values, so we only compare the 4 core fields.
+            wire_usage = body.get("usageDetails", {})
+            expected_usage = {
+                "input": wire_usage.get("input"),
+                "output": wire_usage.get("output"),
+                "total": wire_usage.get("total"),
+                "unit": wire_usage.get("unit"),
+            }
+            actual_usage = obs.get("usage") if obs else None
+            if actual_usage is None:
+                actual_usage = {}
+            actual_usage_subset = {
+                "input": actual_usage.get("input"),
+                "output": actual_usage.get("output"),
+                "total": actual_usage.get("total"),
+                "unit": actual_usage.get("unit"),
+            }
             assertions.append(_assert_eq(
-                f"obs.{obs_id}.usageDetails",
-                obs.get("usageDetails") if obs else None,
-                body.get("usageDetails"),
+                f"obs.{obs_id}.usage",
+                actual_usage_subset,
+                expected_usage,
             ))
         else:
             assertions.append(_assert_eq(
@@ -207,8 +230,18 @@ def validate_scenario(
     )
     assertions.append(_assert_eq("obs.orphans", orphan_count, 0))
 
-    obs_times = [o.get("startTime", "") for o in observations]
-    is_monotonic = obs_times == sorted(obs_times)
+    # Check timestamp monotonicity in EXPECTED event order (not API return order).
+    # Build expected order: map observation ID -> its position in span_events.
+    expected_order = {body["id"]: idx for idx, event in enumerate(span_events) for body in [event["body"]]}
+    # Sort actual observations by their expected position.
+    ordered_obs = sorted(
+        observations,
+        key=lambda o: expected_order.get(o["id"], 999),
+    )
+    obs_times = [o.get("startTime", "") for o in ordered_obs]
+    is_monotonic = all(
+        obs_times[i] <= obs_times[i + 1] for i in range(len(obs_times) - 1)
+    ) if len(obs_times) > 1 else True
     assertions.append(_assert_eq("obs.timestamps_monotonic", is_monotonic, True))
 
     pass_count = sum(1 for a in assertions if a["passed"])
