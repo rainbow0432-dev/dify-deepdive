@@ -1,7 +1,7 @@
 [project]
 name = "dify-trace-catalog"
-version = "0.1.0"
-description = "Reference catalog of Dify app traces as Langfuse wire events"
+version = "0.2.0"
+description = "End-to-end Dify trace generation, ingestion, and validation pipeline for Langfuse"
 requires-python = ">=3.10"
 dependencies = []
 
@@ -14,3 +14,6 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+markers = [
+    "e2e: end-to-end tests against real Langfuse (requires Docker)",
+]

@@ -1,6 +1,6 @@
 # Dify App Trace Reference Catalog
 
-A collection of 14 reference Dify app traces, captured as Langfuse wire events.
+A collection of 13 reference Dify app traces, captured as Langfuse wire events.
 
 ## Structure
 
@@ -23,24 +23,23 @@ See `schema.md` for the full field reference.
 
 ## Scenarios
 
-| # | Directory | App Type | Events | Edge? |
-|---|---|---|---|---|
-| 01 | `01-chat-basic` | chatbot | 4 |  |
-| 02 | `02-chat-rag` | chatbot | 6 |  |
-| 03 | `03-completion-basic` | completion | 4 |  |
-| 04 | `04-agent-single-tool` | agent | 5 |  |
-| 05 | `05-agent-multi-tool` | agent | 7 |  |
-| 06 | `06-workflow-5node` | workflow | 7 |  |
-| 07 | `07-workflow-15node` | workflow | 17 | high-n |
-| 08 | `08-chatflow-basic` | chatflow | 11 |  |
-| 09 | `09-moderation-blocked` | chatbot | 3 | moderation-blocked |
-| 10 | `10-moderation-pass-through` | chatbot | 5 |  |
-| 11 | `11-rag-empty-results` | chatbot | 5 | empty-rag |
-| 12 | `12-tool-failure` | agent | 5 | tool-error |
-| 13 | `13-suggested-questions-error` | chatbot | 5 | suggested-questions-error |
-| 14 | `14-message-streaming` | chatbot | 4 | streaming |
+| # | Directory | App Type | Events | Spans | Pattern |
+|---|---|---|---|---|---|
+| 01 | `01-linear-llm-chain` | workflow | 14 | 13 | linear |
+| 02 | `02-parallel-branches` | workflow | 12 | 11 | parallel-fork-join |
+| 03 | `03-agent-react-loop` | agent-chat | 12 | 11 | react-loop |
+| 04 | `04-multi-tool-chain` | agent-chat | 12 | 10 | sequential-chain |
+| 05 | `05-rag-multi-hop` | chat | 12 | 10 | multi-hop-retrieval |
+| 06 | `06-moderation-rag-tool-combo` | chat | 11 | 10 | feature-combination |
+| 07 | `07-workflow-conditional` | workflow | 12 | 11 | conditional-branch |
+| 08 | `08-error-recovery-agent` | agent-chat | 12 | 10 | error-recovery |
+| 09 | `09-nested-workflow` | advanced-chat | 14 | 12 | nested-workflow |
+| 10 | `10-workflow-error-propagation` | workflow | 11 | 10 | error-propagation |
+| 11 | `11-streaming-chatflow` | advanced-chat | 13 | 11 | streaming |
+| 12 | `12-multi-model-pipeline` | workflow | 12 | 11 | multi-model |
+| 13 | `13-completion-multi-feature` | completion | 12 | 10 | feature-combination |
 
-**Total**: 88 events across 14 scenarios.
+**Total**: 159 events, 140 spans across 13 scenarios.
 
 ## Provenance
 

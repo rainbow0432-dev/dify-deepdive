@@ -1,0 +1,104 @@
+{
+  "scenario_id": "09-nested-workflow",
+  "scenario_description": "Chatflow with sub-workflow node + Message + GenerateName",
+  "app_type": "advanced-chat",
+  "dify_app_mode": "advanced-chat",
+  "edge_case": "nested-workflow",
+  "trace_types_emitted": [
+    "MessageTraceInfo",
+    "WorkflowTraceInfo",
+    "GenerateNameTraceInfo"
+  ],
+  "expected_event_count": 14,
+  "expected_span_count": 12,
+  "span_pattern": "nested-workflow",
+  "events_in_order": [
+    {
+      "index": 1,
+      "type": "trace-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 2,
+      "type": "span-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 3,
+      "type": "span-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 4,
+      "type": "generation-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 5,
+      "type": "span-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 6,
+      "type": "span-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 7,
+      "type": "generation-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 8,
+      "type": "generation-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 9,
+      "type": "span-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 10,
+      "type": "generation-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 11,
+      "type": "span-create",
+      "source_trace_type": "WorkflowTraceInfo",
+      "dify_handler": "LangFuseDataTrace.workflow_trace"
+    },
+    {
+      "index": 12,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 13,
+      "type": "trace-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    },
+    {
+      "index": 14,
+      "type": "span-create",
+      "source_trace_type": "GenerateNameTraceInfo",
+      "dify_handler": "LangFuseDataTrace.generate_name_trace"
+    }
+  ],
+  "dify_commit": "b33e8f0ddb1189427548b0e1206cedcdc17d9bb6",
+  "langfuse_sdk_version": ">=4.2.0,<5.0.0",
+  "notes": "Nested workflow: chatflow with sub-workflow node. Inner workflow events have parentObservationId=SubWorkflow. Outer events have parentObservationId=chatflow root. Message generation is MessageTraceInfo."
+}

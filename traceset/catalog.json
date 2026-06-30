@@ -1,21 +1,63 @@
 [
   {
-    "scenario_id": "01-chat-basic",
-    "app_type": "chatbot",
-    "dify_app_mode": "chat",
+    "scenario_id": "01-linear-llm-chain",
+    "app_type": "workflow",
+    "dify_app_mode": "workflow",
     "edge_case": null,
-    "event_count": 4,
+    "event_count": 14,
+    "span_count": 13,
+    "span_pattern": "linear",
+    "trace_types": [
+      "WorkflowTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "02-parallel-branches",
+    "app_type": "workflow",
+    "dify_app_mode": "workflow",
+    "edge_case": null,
+    "event_count": 12,
+    "span_count": 11,
+    "span_pattern": "parallel-fork-join",
+    "trace_types": [
+      "WorkflowTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "03-agent-react-loop",
+    "app_type": "agent-chat",
+    "dify_app_mode": "agent-chat",
+    "edge_case": null,
+    "event_count": 12,
+    "span_count": 11,
+    "span_pattern": "react-loop",
     "trace_types": [
       "MessageTraceInfo",
+      "ToolTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "04-multi-tool-chain",
+    "app_type": "agent-chat",
+    "dify_app_mode": "agent-chat",
+    "edge_case": null,
+    "event_count": 12,
+    "span_count": 10,
+    "span_pattern": "sequential-chain",
+    "trace_types": [
+      "MessageTraceInfo",
+      "ToolTraceInfo",
       "GenerateNameTraceInfo"
     ]
   },
   {
-    "scenario_id": "02-chat-rag",
-    "app_type": "chatbot",
+    "scenario_id": "05-rag-multi-hop",
+    "app_type": "chat",
     "dify_app_mode": "chat",
     "edge_case": null,
-    "event_count": 6,
+    "event_count": 12,
+    "span_count": 10,
+    "span_pattern": "multi-hop-retrieval",
     "trace_types": [
       "MessageTraceInfo",
       "DatasetRetrievalTraceInfo",
@@ -24,139 +66,117 @@
     ]
   },
   {
-    "scenario_id": "03-completion-basic",
+    "scenario_id": "06-moderation-rag-tool-combo",
+    "app_type": "chat",
+    "dify_app_mode": "chat",
+    "edge_case": null,
+    "event_count": 11,
+    "span_count": 10,
+    "span_pattern": "feature-combination",
+    "trace_types": [
+      "MessageTraceInfo",
+      "ModerationTraceInfo",
+      "DatasetRetrievalTraceInfo",
+      "ToolTraceInfo",
+      "SuggestedQuestionTraceInfo",
+      "GenerateNameTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "07-workflow-conditional",
+    "app_type": "workflow",
+    "dify_app_mode": "workflow",
+    "edge_case": null,
+    "event_count": 12,
+    "span_count": 11,
+    "span_pattern": "conditional-branch",
+    "trace_types": [
+      "WorkflowTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "08-error-recovery-agent",
+    "app_type": "agent-chat",
+    "dify_app_mode": "agent-chat",
+    "edge_case": "error-recovery",
+    "event_count": 12,
+    "span_count": 10,
+    "span_pattern": "error-recovery",
+    "trace_types": [
+      "MessageTraceInfo",
+      "ToolTraceInfo",
+      "DatasetRetrievalTraceInfo",
+      "SuggestedQuestionTraceInfo",
+      "GenerateNameTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "09-nested-workflow",
+    "app_type": "advanced-chat",
+    "dify_app_mode": "advanced-chat",
+    "edge_case": "nested-workflow",
+    "event_count": 14,
+    "span_count": 12,
+    "span_pattern": "nested-workflow",
+    "trace_types": [
+      "MessageTraceInfo",
+      "WorkflowTraceInfo",
+      "GenerateNameTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "10-workflow-error-propagation",
+    "app_type": "workflow",
+    "dify_app_mode": "workflow",
+    "edge_case": "error-propagation",
+    "event_count": 11,
+    "span_count": 10,
+    "span_pattern": "error-propagation",
+    "trace_types": [
+      "WorkflowTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "11-streaming-chatflow",
+    "app_type": "advanced-chat",
+    "dify_app_mode": "advanced-chat",
+    "edge_case": "streaming",
+    "event_count": 13,
+    "span_count": 11,
+    "span_pattern": "streaming",
+    "trace_types": [
+      "MessageTraceInfo",
+      "WorkflowTraceInfo",
+      "SuggestedQuestionTraceInfo",
+      "GenerateNameTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "12-multi-model-pipeline",
+    "app_type": "workflow",
+    "dify_app_mode": "workflow",
+    "edge_case": null,
+    "event_count": 12,
+    "span_count": 11,
+    "span_pattern": "multi-model",
+    "trace_types": [
+      "WorkflowTraceInfo"
+    ]
+  },
+  {
+    "scenario_id": "13-completion-multi-feature",
     "app_type": "completion",
     "dify_app_mode": "completion",
     "edge_case": null,
-    "event_count": 4,
+    "event_count": 12,
+    "span_count": 10,
+    "span_pattern": "feature-combination",
     "trace_types": [
       "MessageTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "04-agent-single-tool",
-    "app_type": "agent",
-    "dify_app_mode": "agent-chat",
-    "edge_case": null,
-    "event_count": 5,
-    "trace_types": [
-      "MessageTraceInfo",
-      "ToolTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "05-agent-multi-tool",
-    "app_type": "agent",
-    "dify_app_mode": "agent-chat",
-    "edge_case": null,
-    "event_count": 7,
-    "trace_types": [
-      "MessageTraceInfo",
-      "ToolTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "06-workflow-5node",
-    "app_type": "workflow",
-    "dify_app_mode": "workflow",
-    "edge_case": null,
-    "event_count": 7,
-    "trace_types": [
-      "WorkflowTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "07-workflow-15node",
-    "app_type": "workflow",
-    "dify_app_mode": "workflow",
-    "edge_case": "high-n",
-    "event_count": 17,
-    "trace_types": [
-      "WorkflowTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "08-chatflow-basic",
-    "app_type": "chatflow",
-    "dify_app_mode": "advanced-chat",
-    "edge_case": null,
-    "event_count": 11,
-    "trace_types": [
-      "WorkflowTraceInfo",
-      "MessageTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "09-moderation-blocked",
-    "app_type": "chatbot",
-    "dify_app_mode": "chat",
-    "edge_case": "moderation-blocked",
-    "event_count": 3,
-    "trace_types": [
       "ModerationTraceInfo",
-      "MessageTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "10-moderation-pass-through",
-    "app_type": "chatbot",
-    "dify_app_mode": "chat",
-    "edge_case": null,
-    "event_count": 5,
-    "trace_types": [
-      "ModerationTraceInfo",
-      "MessageTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "11-rag-empty-results",
-    "app_type": "chatbot",
-    "dify_app_mode": "chat",
-    "edge_case": "empty-rag",
-    "event_count": 5,
-    "trace_types": [
       "DatasetRetrievalTraceInfo",
-      "MessageTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "12-tool-failure",
-    "app_type": "agent",
-    "dify_app_mode": "agent-chat",
-    "edge_case": "tool-error",
-    "event_count": 5,
-    "trace_types": [
       "ToolTraceInfo",
-      "MessageTraceInfo",
-      "GenerateNameTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "13-suggested-questions-error",
-    "app_type": "chatbot",
-    "dify_app_mode": "chat",
-    "edge_case": "suggested-questions-error",
-    "event_count": 5,
-    "trace_types": [
-      "MessageTraceInfo",
-      "GenerateNameTraceInfo",
-      "SuggestedQuestionTraceInfo"
-    ]
-  },
-  {
-    "scenario_id": "14-message-streaming",
-    "app_type": "chatbot",
-    "dify_app_mode": "chat",
-    "edge_case": "streaming",
-    "event_count": 4,
-    "trace_types": [
-      "MessageTraceInfo",
+      "SuggestedQuestionTraceInfo",
       "GenerateNameTraceInfo"
     ]
   }

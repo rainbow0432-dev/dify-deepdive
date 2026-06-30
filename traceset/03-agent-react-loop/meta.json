@@ -1,0 +1,91 @@
+{
+  "scenario_id": "03-agent-react-loop",
+  "scenario_description": "5 ReAct iterations (think-act) + final synthesis",
+  "app_type": "agent-chat",
+  "dify_app_mode": "agent-chat",
+  "edge_case": null,
+  "trace_types_emitted": [
+    "MessageTraceInfo",
+    "ToolTraceInfo"
+  ],
+  "expected_event_count": 12,
+  "expected_span_count": 11,
+  "span_pattern": "react-loop",
+  "events_in_order": [
+    {
+      "index": 1,
+      "type": "trace-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 2,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 3,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 4,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 5,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 6,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 7,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 8,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 9,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 10,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    },
+    {
+      "index": 11,
+      "type": "span-create",
+      "source_trace_type": "ToolTraceInfo",
+      "dify_handler": "LangFuseDataTrace.tool_trace"
+    },
+    {
+      "index": 12,
+      "type": "generation-create",
+      "source_trace_type": "MessageTraceInfo",
+      "dify_handler": "LangFuseDataTrace.message_trace"
+    }
+  ],
+  "dify_commit": "b33e8f0ddb1189427548b0e1206cedcdc17d9bb6",
+  "langfuse_sdk_version": ">=4.2.0,<5.0.0",
+  "notes": "ReAct loop: 5 iterations of think (LLM) then act (tool). Tools: sql_query, calculator, python_interpreter, web_search, data_lookup. Final synthesis LLM call."
+}
