@@ -230,19 +230,26 @@ def validate_scenario(
     )
     assertions.append(_assert_eq("obs.orphans", orphan_count, 0))
 
-    # Check timestamp monotonicity in EXPECTED event order (not API return order).
-    # Build expected order: map observation ID -> its position in span_events.
+    # Check timestamp consistency: first obs startTime <= last obs startTime
+    # (overall flow is forward). Per-pair monotonicity is NOT required because
+    # parallel branches (e.g. scenario 02) have overlapping startTimes.
+    # Also check no observation has startTime > endTime (individual validity).
     expected_order = {body["id"]: idx for idx, event in enumerate(span_events) for body in [event["body"]]}
-    # Sort actual observations by their expected position.
     ordered_obs = sorted(
         observations,
         key=lambda o: expected_order.get(o["id"], 999),
     )
-    obs_times = [o.get("startTime", "") for o in ordered_obs]
-    is_monotonic = all(
-        obs_times[i] <= obs_times[i + 1] for i in range(len(obs_times) - 1)
-    ) if len(obs_times) > 1 else True
-    assertions.append(_assert_eq("obs.timestamps_monotonic", is_monotonic, True))
+    if len(ordered_obs) > 1:
+        first_start = ordered_obs[0].get("startTime", "")
+        last_start = ordered_obs[-1].get("startTime", "")
+        flow_forward = first_start <= last_start
+    else:
+        flow_forward = True
+    no_negative_duration = all(
+        o.get("startTime", "") <= o.get("endTime", "") for o in observations
+    )
+    is_consistent = flow_forward and no_negative_duration
+    assertions.append(_assert_eq("obs.timestamps_consistent", is_consistent, True))
 
     pass_count = sum(1 for a in assertions if a["passed"])
     fail_count = sum(1 for a in assertions if not a["passed"])
